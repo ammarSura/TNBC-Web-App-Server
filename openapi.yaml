@@ -1,0 +1,94 @@
+openapi: 3.0.1
+info:
+  title: TNBC Triple Negative Cell Segmentation 
+  version: 1.0.0
+  description: Web App for Triple Negative Cell Segmentation research
+# servers:
+#   - url: url
+#     description: Production server
+paths:
+  /coordinates{imageId}:
+    get:
+      operationId: coordinatesGet
+      tags:
+        - Coordinates
+      summary: Get coordinates of the segments on each image
+      parameters:
+        - name: imageId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                properties:
+                  coordinates:
+                    type: object
+                    additionalProperties: false
+                    properties:
+                      something: 
+                        type: string
+  /images:
+    get:
+      operationId: imagesGet
+      tags:
+        - Images
+      summary: Get three images to assess
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                properties:
+                  schema:
+                    type: object
+                    additionalProperties: false
+                    properties:
+                      something: 
+                        type: string
+  /login:
+    post:
+      operationId: login
+      tags:
+        - Auth
+      summary: Allow user to log in
+      requestBody:
+        description: Username and password
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              properties:
+                coordinates:
+                  type: object
+                  additionalProperties: false
+                  properties:
+                    username:
+                      type: string
+                    password:
+                      type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                properties:
+                  success:
+                    type: boolean
+                
+                
+        
