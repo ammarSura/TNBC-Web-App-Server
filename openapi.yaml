@@ -7,7 +7,7 @@ info:
 #   - url: url
 #     description: Production server
 paths:
-  /coordinates{imageId}:
+  /coordinates/{imageId}:
     get:
       operationId: coordinatesGet
       tags:
@@ -69,15 +69,21 @@ paths:
             schema:
               type: object
               additionalProperties: false
+              required:
+                - idToken
               properties:
-                coordinates:
-                  type: object
-                  additionalProperties: false
-                  properties:
-                    username:
-                      type: string
-                    password:
-                      type: string
+                idToken:
+                  type: string
+                # coordinates:
+                #   type: object
+                #   additionalProperties: false
+                #   properties:
+                #     # username:
+                #     #   type: string
+                #     # password:
+                #     #   type: string
+                #     idToken:
+                #       type: string
       responses:
         '200':
           description: OK
