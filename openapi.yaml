@@ -53,8 +53,38 @@ paths:
                     type: object
                     additionalProperties: false
                     properties:
-                      something: 
+                      imageId: 
                         type: string
+                      url:
+                        type: string
+                      coors:
+                        type: string 
+      security:
+        - bearerAuth: []
+  /images-annotation-selection/{imageId}:
+    patch:
+      operationId: imagesAnnotationSelection
+      tags:
+        - Images Annotation Selection
+      summary: Submit the results of best annotation from client
+      parameters:
+        - name: imageId
+          in: path
+          description: Image Id to patch
+          required: true
+          schema:
+            type: string
+        - name: coorId
+          in: query
+          description: Coordinate Id to patch
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK     
+      security:
+        - bearerAuth: []       
   /login:
     post:
       operationId: login
@@ -74,16 +104,6 @@ paths:
               properties:
                 idToken:
                   type: string
-                # coordinates:
-                #   type: object
-                #   additionalProperties: false
-                #   properties:
-                #     # username:
-                #     #   type: string
-                #     # password:
-                #     #   type: string
-                #     idToken:
-                #       type: string
       responses:
         '200':
           description: OK
@@ -93,8 +113,16 @@ paths:
                 type: object
                 additionalProperties: false
                 properties:
-                  success:
-                    type: boolean
+                  accessToken:
+                    type: string
+components:
+  securitySchemes:
+    bearerAuth:           
+      type: http
+      scheme: bearer
+      bearerFormat: JWT   
+
+
                 
                 
         

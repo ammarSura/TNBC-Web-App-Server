@@ -2,23 +2,23 @@ import express from 'express'
 import { makeApi } from './initialise-api'
 import type { Request } from 'openapi-backend';
 import { connect } from 'mongoose';
+import cors from 'cors'
 
-
-const makeServer = (port: number, initMessage: string, connectionUri: string) => {
+const makeServer = () => {
     const app = express()
     const api = makeApi()
     app.use(express.json())
+    app.use(cors())
     app.use((req, res) => {
-        console.log(req.body)
-        return api.handleRequest(req as Request, req, res)
-    })
-
-    connect(connectionUri)
-        .then(() => console.log('Connected to MongoDB at ', connectionUri))
-
-    app.listen(port, () => {
-    console.log('Port: ', port)
-    console.log(initMessage)
+        try {
+            return api.handleRequest(req as Request, req, res, true)
+        } catch(e) {
+            console.log(e)
+            return res.status(500).json({
+                message: 'Internal server error'
+            })
+        }
+       
     })
     return app
 }
