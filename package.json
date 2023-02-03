@@ -22,7 +22,7 @@
   "scripts": {
     "build": "tsc",
     "start:tsc": "CPUS=2 TS=1 TZ=UTC ts-node src",
-    "start": "NODE_ENV=production yarn start .build/src",
+    "start": "NODE_ENV=production node .build/src",
     "start:nodemon": "./node_modules/nodemon/bin/nodemon.js",
     "test": "NODE_ENV=test yarn jest",
     "generate:types": "yarn ts-node src/utils/generate-types.ts"
