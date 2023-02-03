@@ -3,7 +3,6 @@ import { Response } from 'express'
 export type IUser = {
     name: string
     email: string
-    token: string
     designation?: string
 }
 
@@ -28,7 +27,13 @@ export type IImage = {
 }
 
 export type JWTData = {
-    user_id: string
+    userId: string
 }
 
 export type IRoute = (user: JWTData, params: any, res: Response) => Promise<any>
+
+export type IRefreshToken = {
+    token: string
+    userId: string
+    expiresAt: number
+}

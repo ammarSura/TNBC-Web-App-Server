@@ -10,35 +10,61 @@ import { DecodedIdToken } from 'firebase-admin/lib/auth/token-verifier'
 import { sign } from 'jsonwebtoken'
 import { getAccessToken } from '../utils/jwt-utils'
 import { JWTData } from '../types/types'
+import { randomUUID } from 'crypto'
+import RefreshToken from '../schemas/RefreshToken'
 
 const SECRET_KEY = 'mysecret'
   
 export const login =  async(user: JWTData, params, res: Response) => {
-    const { idToken } = params
-    let isValidIdToken: DecodedIdToken
-    try {
-        isValidIdToken = await firebase.verifyIdToken(idToken)
-    } catch (error) {
-        console.log(error)
-        return res.status(400).send('Invalid token')
-    }
-    const { email, name } = isValidIdToken
+    console.log(params)
+    const idToken = params?.idToken
+    let refreshToken = params?.refreshToken
+    let email: string | undefined
+    const result: {
+        accessToken?: string
+        refreshToken?: string
+        refreshTokenExpiresAt?: number
+
+    } = {}
+    console.log(idToken, refreshToken)
+    if(refreshToken) {
+        const fetchedToken = await RefreshToken
+            .findOne({ token: refreshToken })
+        if(!fetchedToken) {
+            return res.status(400).json({
+                message: 'You do not have access to this app'
+            })
+        }
+        email = fetchedToken.userId
+    } else{
+        let isValidIdToken: DecodedIdToken
+        try {
+            isValidIdToken = await firebase.verifyIdToken(idToken)
+        } catch (error) {
+            console.log(error)
+            return res.status(400).send('Invalid token')
+        }
+        email = isValidIdToken.email
+        const fetchedUser = await User.findOne({ email })
     
-    const fetchedUser = await User.findOne({ email })
-    
-    if(!fetchedUser) {
-        return res.status(400).json({
-            message: 'You do not have access to this app'
-        })
+        if(!fetchedUser) {
+            return res.status(400).json({
+                message: 'You do not have access to this app'
+            })
+        }
+        const newRefreshToken = await RefreshToken
+            .create({
+                token: randomUUID(),
+                expiresAt: Date.now() + 1000 * 60 * 60 * 24 * 7,
+                userId: email
+            })
+        result.refreshToken = newRefreshToken.token
+        result.refreshTokenExpiresAt = newRefreshToken.expiresAt
     }
-
-    const accessToken = getAccessToken({
-        user_id: email!
+    
+    result.accessToken = getAccessToken({
+        userId: email!
     })
-
-    await fetchedUser.updateOne({ token: accessToken })
-
-    return res.status(200).json({
-        accessToken
-    })
+    
+    return res.status(200).json(result)
 }

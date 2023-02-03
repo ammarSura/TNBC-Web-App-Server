@@ -32,7 +32,7 @@ describe('Login tests', () => {
     afterAll(async () => {
         await connection.close()
     })
-    test('Should login successfully', async() => {
+    test('Should login successfully with idToken', async() => {
         firebase.verifyIdToken = jest.fn((idToken) => {
             return {
                 email: testUser.email,
@@ -42,10 +42,46 @@ describe('Login tests', () => {
         const req = {
             idToken: chance.guid()
         }
-        await request(app)
+        const { body: { accessToken, refreshToken, refreshTokenExpiresAt} } = await request(app)
             .post('/login')
             .send(req)
             .expect(200)
+
+        expect(accessToken).toBeDefined()
+        expect(refreshToken).toBeDefined()
+        expect(refreshTokenExpiresAt).toBeDefined()
+    })
+
+    test('Should get access token using refresh token', async() => {
+        firebase.verifyIdToken = jest.fn((idToken) => {
+            return {
+                email: testUser.email,
+                name: testUser.name
+            } as unknown as Promise<DecodedIdToken>
+        })
+        const req = {
+            idToken: chance.guid()
+        }
+        const { body: { refreshToken } } = await request(app)
+            .post('/login')
+            .send(req)
+            .expect(200)
+
+        const { body: body1 } =await request(app)
+            .post('/login')
+            .send({ refreshToken })
+            .expect(200)
+
+        console.log(body1)
+    })
+
+    test('Should fail to get access token with garbage refreshToken', async() => {
+        const refreshToken = chance.guid()
+        const req = {refreshToken}
+        await request(app)
+            .post('/login')
+            .send(req)
+            .expect(400)
     })
 
     test('Should fail to login with random user', async() => {

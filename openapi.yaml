@@ -99,10 +99,10 @@ paths:
             schema:
               type: object
               additionalProperties: false
-              required:
-                - idToken
               properties:
                 idToken:
+                  type: string
+                refreshToken:
                   type: string
       responses:
         '200':
