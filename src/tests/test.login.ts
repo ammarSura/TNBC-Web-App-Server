@@ -9,12 +9,13 @@ import { FacebookAuthProvider, GoogleAuthProvider } from 'firebase/auth'
 import 'firebase/compat/auth'
 import firebase from '../utils/initialise-firebase'
 import { DecodedIdToken } from 'firebase-admin/lib/auth/token-verifier';
+import { describeWrapper, loginUserWithIdToken } from './test-setup';
 
 const googleProvider = new GoogleAuthProvider()
 const facebookProvider = new FacebookAuthProvider()
 
 const chance = new Chance()
-describe('Login tests', () => {
+describeWrapper('Login tests', () => {
     const testUser = {
         name: chance.name(),
         email: chance.email(),
@@ -22,62 +23,50 @@ describe('Login tests', () => {
         designation: chance.profession()
     }
     
+    
     beforeAll(async () => {
-        await connect('mongodb://localhost:27017/tnbc-test')
+        // await connect('mongodb://localhost:27017/tnbc-test')
         const newUser = new User(testUser)
         await newUser.save()
         
     })
 
-    afterAll(async () => {
-        await connection.close()
-    })
+    // afterAll(async () => {
+    //     await connection.close()
+    // })
     test('Should login successfully with idToken', async() => {
-        firebase.verifyIdToken = jest.fn((idToken) => {
-            return {
-                email: testUser.email,
-                name: testUser.name
-            } as unknown as Promise<DecodedIdToken>
-        })
-        const req = {
-            idToken: chance.guid()
-        }
-        const { body: { accessToken, refreshToken, refreshTokenExpiresAt} } = await request(app)
-            .post('/login')
-            .send(req)
-            .expect(200)
+        // firebase.verifyIdToken = jest.fn((idToken) => {
+        //     return {
+        //         email: testUser.email,
+        //         name: testUser.name
+        //     } as unknown as Promise<DecodedIdToken>
+        // })
+        // const req = {
+        //     idToken: chance.guid()
+        // }
+        // const { body: { accessToken, refreshToken, refreshTokenExpiresAt} } = await request(app)
+        //     .post('/login')
+        //     .send(req)
+        //     .expect(200)
 
-        expect(accessToken).toBeDefined()
-        expect(refreshToken).toBeDefined()
-        expect(refreshTokenExpiresAt).toBeDefined()
+        // expect(accessToken).toBeDefined()
+        // expect(refreshToken).toBeDefined()
+        // expect(refreshTokenExpiresAt).toBeDefined()
+        await loginUserWithIdToken(testUser)
     })
 
     test('Should get access token using refresh token', async() => {
-        firebase.verifyIdToken = jest.fn((idToken) => {
-            return {
-                email: testUser.email,
-                name: testUser.name
-            } as unknown as Promise<DecodedIdToken>
-        })
-        const req = {
-            idToken: chance.guid()
-        }
-        const { body: { refreshToken } } = await request(app)
-            .post('/login')
-            .send(req)
-            .expect(200)
+        const { refreshToken } = await loginUserWithIdToken(testUser)
 
-        const { body: body1 } =await request(app)
+        await request(app)
             .post('/login')
             .send({ refreshToken })
             .expect(200)
-
-        console.log(body1)
     })
 
     test('Should fail to get access token with garbage refreshToken', async() => {
         const refreshToken = chance.guid()
-        const req = {refreshToken}
+        const req = { refreshToken }
         await request(app)
             .post('/login')
             .send(req)
