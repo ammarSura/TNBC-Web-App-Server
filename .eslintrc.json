@@ -1,0 +1,32 @@
+{
+    "env": {
+        "browser": true,
+        "es2021": true
+    },
+    "extends": "plugin:react/recommended",
+    "parser": "@typescript-eslint/parser",
+    "plugins": [
+        "@typescript-eslint",
+        "react",
+        "simple-import-sort"
+    ],
+    "overrides": [
+    ],
+    "parserOptions": {
+        // "ecmaVersion": "latest",
+        "sourceType": "module"
+        // "project": "./tsconfig.json"
+    },
+    "rules": {
+        "@typescript-eslint/no-unused-vars": [
+            "error"
+        ],
+        "camelcase": [
+            "error",
+            {
+                "ignoreGlobals": true,
+                "ignoreImports": true
+            }
+        ]
+    }
+}
