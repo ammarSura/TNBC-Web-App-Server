@@ -1,7 +1,7 @@
 import { sign, verify } from 'jsonwebtoken'
 import { type JWTData } from '../types/types'
 
-const nodeEnv = process.env.NODE_ENV || 'development'
+const nodeEnv = process.env.NODE_ENV || 'test'
 require('dotenv').config({ path: `.env.${nodeEnv}` })
 
 const secretKey = process.env.SECRET_KEY!
