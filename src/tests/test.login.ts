@@ -11,9 +11,6 @@ import firebase from '../utils/initialise-firebase'
 import { DecodedIdToken } from 'firebase-admin/lib/auth/token-verifier';
 import { describeWrapper, loginUserWithIdToken } from './test-setup';
 
-const googleProvider = new GoogleAuthProvider()
-const facebookProvider = new FacebookAuthProvider()
-
 const chance = new Chance()
 describeWrapper('Login tests', () => {
     const testUser = {
@@ -23,35 +20,11 @@ describeWrapper('Login tests', () => {
         designation: chance.profession()
     }
     
-    
     beforeAll(async () => {
-        // await connect('mongodb://localhost:27017/tnbc-test')
         const newUser = new User(testUser)
         await newUser.save()
-        
     })
-
-    // afterAll(async () => {
-    //     await connection.close()
-    // })
     test('Should login successfully with idToken', async() => {
-        // firebase.verifyIdToken = jest.fn((idToken) => {
-        //     return {
-        //         email: testUser.email,
-        //         name: testUser.name
-        //     } as unknown as Promise<DecodedIdToken>
-        // })
-        // const req = {
-        //     idToken: chance.guid()
-        // }
-        // const { body: { accessToken, refreshToken, refreshTokenExpiresAt} } = await request(app)
-        //     .post('/login')
-        //     .send(req)
-        //     .expect(200)
-
-        // expect(accessToken).toBeDefined()
-        // expect(refreshToken).toBeDefined()
-        // expect(refreshTokenExpiresAt).toBeDefined()
         await loginUserWithIdToken(testUser)
     })
 
@@ -78,7 +51,7 @@ describeWrapper('Login tests', () => {
             return {
                 email: chance.email(),
                 name: chance.name()
-            } as unknown as Promise<DecodedIdToken>
+            } as any as Promise<DecodedIdToken>
         })
         const req = {
             idToken: chance.guid()
