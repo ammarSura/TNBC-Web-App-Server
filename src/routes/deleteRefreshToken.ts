@@ -1,3 +1,4 @@
+import { Boom } from '@hapi/boom'
 import { Request, type Response } from 'express'
 import Image from '../schemas/Image'
 import RefreshToken from '../schemas/RefreshToken'
@@ -7,22 +8,18 @@ import { type JWTData } from '../types/types'
 export const deleteRefreshToken = async ({ userId }: JWTData, params, res: Response) => {
   const fetchedUser = await User.findOne({ email: userId })
   if (fetchedUser == null) {
-    return res.status(404).json({
-      message: 'User not found'
-    })
+    throw new Boom('User not found', { statusCode: 404 })
   }
 
   if (!fetchedUser.isAdmin) {
-    return res.status(403).json({
-      message: 'You do not have access to this route'
-    })
+    throw new Boom('You do not have access to this route', { statusCode: 403 })
   }
 
   await RefreshToken.deleteOne({
     token: params.refreshToken
   })
 
-  return res.status(200).json({
-    message: 'success'
-  })
+  return {
+    message: 'Refresh token deleted'
+  }
 }
