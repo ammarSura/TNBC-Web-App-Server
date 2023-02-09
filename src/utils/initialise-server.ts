@@ -7,17 +7,7 @@ const makeServer = () => {
   const api = makeApi()
   app.use(express.json())
   app.use(cors())
-  app.use((req, res) => {
-    try {
-      return api.handleRequest(req as Request, req, res, true)
-    } catch (e) {
-      console.error(e)
-      // logger.error()
-      return res.status(500).json({
-        message: 'Internal server error'
-      })
-    }
-  })
+  app.use((req, res) => api.handleRequest(req as Request, req, res, true))
   return app
 }
 

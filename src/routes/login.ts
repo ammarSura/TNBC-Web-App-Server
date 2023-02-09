@@ -1,13 +1,7 @@
 import { Request, type Response } from 'express'
 import User from '../schemas/User'
-import { model } from 'mongoose'
-import { compare } from 'bcrypt'
-import admin from 'firebase-admin'
-import { initializeApp } from 'firebase/app'
-import serviceAccount from '../../.secrets/test-auth-2bc3b-firebase-adminsdk-cqb6a-0bad906651.json'
 import firebase from '../utils/initialise-firebase'
 import { type DecodedIdToken } from 'firebase-admin/lib/auth/token-verifier'
-import { sign } from 'jsonwebtoken'
 import { getAccessToken } from '../utils/jwt-utils'
 import { type JWTData } from '../types/types'
 import { randomUUID } from 'crypto'
@@ -44,9 +38,7 @@ export const login = async (user: JWTData, params, res: Response) => {
     const fetchedUser = await User.findOne({ email })
 
     if (fetchedUser == null) {
-      return res.status(400).json({
-        message: 'You do not have access to this app'
-      })
+      throw new Boom('You do not have access to this app', { statusCode: 403 })
     }
     const newRefreshToken = await RefreshToken
       .create({
@@ -61,5 +53,6 @@ export const login = async (user: JWTData, params, res: Response) => {
   result.accessToken = getAccessToken({
     userId: email!
   })
+
   return result
 }

@@ -7,24 +7,18 @@ import { coordinatesGet } from '../routes/coordinatesGet'
 import { imagesAnnotationSelection } from '../routes/imagesAnnotationSelection'
 import { verifyToken } from './jwt-utils'
 import handler from './handler-express'
+import { Boom } from '@hapi/boom'
 
 const jwtHandler = async (c: Context, req, res) => {
-  if (c.operation.operationId === 'login') {
-    return
-  }
   const auth = c.request.headers.authorization as string
   if (!auth) {
-    res.status(401).json({
-      message: 'No Auth Header'
-    })
+    throw new Boom('No Auth Header', { statusCode: 400 })
   }
 
   const verified = verifyToken(auth)
 
   if (!verified) {
-    return res.status(401).json({
-      message: 'Unauthorized'
-    })
+    throw new Boom('Unauthorized', { statusCode: 401 })
   }
   const { payload } = verified
   return payload
@@ -34,21 +28,21 @@ export const makeApi = () => {
   const api = new OpenAPIBackend({ definition: './openapi.yaml' })
   api.register({
     notFound: (c, req, res: Response) => {
-      res.status(404).json({ message: 'Route not found' })
+      throw new Boom('Not Found', { statusCode: 404 })
     },
-    login: (c, req, res: Response) => {
+    login: (c, _, res: Response) => {
       handler(login, c, res)
     },
-    deleteRefreshToken: (c, req, res: Response) => {
+    deleteRefreshToken: (c, _, res: Response) => {
       handler(deleteRefreshToken, c, res)
     },
-    imagesGet: (c, req, res: Response) => {
+    imagesGet: (c, _, res: Response) => {
       handler(imagesGet, c, res)
     },
-    coordinatesGet: (c, req, res: Response) => {
+    coordinatesGet: (c, _, res: Response) => {
       handler(coordinatesGet, c, res)
     },
-    imagesAnnotationSelection: (c, req, res: Response) => {
+    imagesAnnotationSelection: (c, _, res: Response) => {
       handler(imagesAnnotationSelection, c, res)
     }
   })
