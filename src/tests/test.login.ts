@@ -9,7 +9,8 @@ import { FacebookAuthProvider, GoogleAuthProvider } from 'firebase/auth'
 import 'firebase/compat/auth'
 import firebase from '../utils/initialise-firebase'
 import { DecodedIdToken } from 'firebase-admin/lib/auth/token-verifier';
-import { describeWrapper, loginUserWithIdToken } from './test-setup';
+import describeWrapper from './test-setup';
+import { loginUserWithIdToken } from './utils';
 
 const chance = new Chance()
 describeWrapper('Login tests', () => {
@@ -59,6 +60,6 @@ describeWrapper('Login tests', () => {
         await request(app)
             .post('/login')
             .send(req)
-            .expect(400)
+            .expect(403)
     })
 })
