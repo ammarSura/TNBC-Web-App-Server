@@ -84,15 +84,14 @@ export const describeWrapper = async(suiteName: string, childTests: () => void) 
     describe(suiteName, () => {
         beforeAll(async () => {
             await connect('mongodb://localhost:27017/tnbc-test')
-            
         })    
 
         childTests()
 
         afterAll(async () => {
-            // await connection.close()
             const { email } = await getAdminUser()
             await User.deleteOne({ email })
+            await connection.close()
         })
     })
     
