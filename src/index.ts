@@ -1,8 +1,11 @@
 import { connect } from 'mongoose'
 import makeServer from './utils/initialise-server'
-const PORT = 3001
+
+const PORT = 3001 || process.env.PORT
 const INIT_MESSAGE = 'App initialised'
-const CONNECTION_URI = 'mongodb://localhost:27017/tnbc'
+const CONNECTION_URI = process.env.CONNECTION_URI
+
+if(!CONNECTION_URI) throw new Error('CONNECTION_URI not set')
 
 const app = makeServer()
 
