@@ -19,8 +19,7 @@
     "jsonwebtoken": "^8.5.1",
     "mongoose": "^6.7.2",
     "openapi-backend": "^5.5.0",
-    "pino": "^8.8.0",
-    "tiff-to-png": "^2.0.2"
+    "pino": "^8.8.0"
   },
   "scripts": {
     "build": "tsc",

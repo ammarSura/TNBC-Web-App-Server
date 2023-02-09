@@ -6566,11 +6566,6 @@ thread-stream@^2.0.0:
   dependencies:
     real-require "^0.2.0"
 
-tiff-to-png@^2.0.2:
-  version "2.0.2"
-  resolved "https://registry.yarnpkg.com/tiff-to-png/-/tiff-to-png-2.0.2.tgz#581a4dbc2374b387dcb05eb132f4a31517a05a96"
-  integrity sha512-1gD1s5aeYdsTJ1xskXcf+qlpZKXsMiVm1PZan4VjN2RMAEgqBG/pHLXegTwmdT9ihOjCjYmk4kx6MJCZ20Bvdg==
-
 tiny-glob@^0.2.9:
   version "0.2.9"
   resolved "https://registry.yarnpkg.com/tiny-glob/-/tiny-glob-0.2.9.tgz#2212d441ac17928033b110f8b3640683129d31e2"
