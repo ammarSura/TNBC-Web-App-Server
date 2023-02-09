@@ -9,11 +9,8 @@ import { FacebookAuthProvider, GoogleAuthProvider } from 'firebase/auth'
 import 'firebase/compat/auth'
 import firebase from '../utils/initialise-firebase'
 import { DecodedIdToken } from 'firebase-admin/lib/auth/token-verifier';
-import { createDummyUser, describeWrapper, getUserAccessToken, getAdminUser, loginUserWithIdToken } from './test-setup'
-
-
-const googleProvider = new GoogleAuthProvider()
-const facebookProvider = new FacebookAuthProvider()
+import { createDummyUser, getUserAccessToken, getAdminUser, loginUserWithIdToken } from './utils'
+import describeWrapper from './test-setup';
 
 const chance = new Chance()
 describeWrapper('Refresh Token tests', () => {
