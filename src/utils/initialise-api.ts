@@ -8,13 +8,14 @@ import { imagesAnnotationSelection } from '../routes/imagesAnnotationSelection'
 import { verifyToken } from './jwt-utils'
 import handler from './handler-express'
 import { Boom } from '@hapi/boom'
+import { userGet } from '../routes/userGet'
+import logger from './logger'
 
 const jwtHandler = async (c: Context, req, res) => {
   const auth = c.request.headers.authorization as string
   if (!auth) {
-    throw new Boom('No Auth Header', { statusCode: 400 })
+    throw new Boom('No authorization header', { statusCode: 400 }) 
   }
-
   const verified = verifyToken(auth)
 
   if (!verified) {
@@ -28,7 +29,7 @@ export const makeApi = () => {
   const api = new OpenAPIBackend({ definition: './openapi.yaml' })
   api.register({
     notFound: (c, req, res: Response) => {
-      throw new Boom('Not Found', { statusCode: 404 })
+      res.status(404).json({ message: 'Not Found' })
     },
     login: (c, _, res: Response) => {
       handler(login, c, res)
@@ -36,18 +37,11 @@ export const makeApi = () => {
     deleteRefreshToken: (c, _, res: Response) => {
       handler(deleteRefreshToken, c, res)
     },
-    imagesGet: (c, _, res: Response) => {
-      handler(imagesGet, c, res)
-    },
-    coordinatesGet: (c, _, res: Response) => {
-      handler(coordinatesGet, c, res)
-    },
-    imagesAnnotationSelection: (c, _, res: Response) => {
-      handler(imagesAnnotationSelection, c, res)
+    getUser: (c, _, res: Response) => {
+      handler(userGet, c, res)
     }
   })
   api.registerSecurityHandler('bearerAuth', jwtHandler)
-
   api.init()
   return api
 }
