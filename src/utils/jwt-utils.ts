@@ -3,6 +3,7 @@ import { type JWTData } from '../types/types'
 
 const nodeEnv = process.env.NODE_ENV || 'test'
 require('dotenv').config({ path: `.env.${nodeEnv}` })
+const EXPIRATION_IN_MINUTES = 8 * 60
 
 const secretKey = process.env.SECRET_KEY!
 
@@ -15,13 +16,18 @@ export const verifyToken = (auth: string) => {
   }
 }
 
-export const getAccessToken = (details: JWTData) => {
+export const getAccessToken = (userId: string, isAdmin?: boolean) => {
+  const iat = Math.floor(Date.now() / 1000)
+  const exp = iat + EXPIRATION_IN_MINUTES * 60
+  const data = {
+    userId,
+    iat,
+    exp,
+    isAdmin,
+  }
   const accessToken = sign(
-    details,
+    data,
     secretKey,
-    {
-      expiresIn: '1h'
-    }
   )
-  return accessToken
+  return {accessToken, accessTokenExpiresAt: exp}
 }

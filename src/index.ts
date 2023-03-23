@@ -1,5 +1,6 @@
 import { connect } from 'mongoose'
 import makeServer from './utils/initialise-server'
+import logger from './utils/logger'
 
 const PORT = 3001 || process.env.PORT
 const INIT_MESSAGE = 'App initialised'
@@ -10,9 +11,11 @@ if(!CONNECTION_URI) throw new Error('CONNECTION_URI not set')
 const app = makeServer()
 
 connect(CONNECTION_URI)
-  .then(() => { console.log('Connected to MongoDB at ', CONNECTION_URI) })
+  .then(() => { 
+    logger.info('Connected to database')
+   })
 
 app.listen(PORT, () => {
-  console.log('Port: ', PORT)
-  console.log(INIT_MESSAGE)
+  logger.info(`Started server on port ${PORT}`)
+  logger.info(INIT_MESSAGE)
 })
