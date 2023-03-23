@@ -17,7 +17,7 @@ export const TEST_TOKEN = getAccessToken({
 export const getAdminUser = async() => {
     let adminUser: IUser | null = await User.findOne({ isAdmin: true })
     if(!adminUser) {
-        adminUser = {
+        const newUser = new User({
             name: chance.name(),
             email: chance.email(),
             designation: chance.profession(),

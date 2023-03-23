@@ -49,7 +49,7 @@ const handler = async (route: IRoute, c: Context, res: Response) => {
             try {
               const {valid, errors} = c.api.validateResponse(response, c.operation, 200)
             } catch(error) {
-              console.error(error)
+              logger.error(error)
             }
           }
         } catch(error) {
