@@ -11,19 +11,20 @@ import firebase from '../utils/initialise-firebase'
 import { DecodedIdToken } from 'firebase-admin/lib/auth/token-verifier';
 import describeWrapper from './test-setup';
 import { loginUserWithIdToken } from './utils';
+import RefreshToken from '../schemas/RefreshToken';
 
 const chance = new Chance()
 describeWrapper('Login tests', () => {
-    const testUser = {
-        name: chance.name(),
-        email: chance.email(),
-        token: chance.guid(),
-        designation: chance.profession()
-    }
+    let testUser: IUser
     
     beforeAll(async () => {
-        const newUser = new User(testUser)
-        await newUser.save()
+        const newUser = new User({
+            name: chance.name(),
+            email: chance.email(),
+            token: chance.guid(),
+            designation: chance.profession()
+        })
+        testUser = await newUser.save()
     })
     test('Should login successfully with idToken', async() => {
         await loginUserWithIdToken(testUser)
@@ -32,10 +33,16 @@ describeWrapper('Login tests', () => {
     test('Should get access token using refresh token', async() => {
         const { refreshToken } = await loginUserWithIdToken(testUser)
 
-        await request(app)
+        const { body: { accessToken, refreshToken: newRefreshToken }} = await request(app)
             .post('/login')
             .send({ refreshToken })
             .expect(200)
+        
+        expect(accessToken).toBeDefined()
+        expect(newRefreshToken).toBeDefined()
+        
+        const oldToken = await RefreshToken.findOne({ token: refreshToken })
+        expect(oldToken).toBeNull()
     })
 
     test('Should fail to get access token with garbage refreshToken', async() => {
@@ -60,6 +67,28 @@ describeWrapper('Login tests', () => {
         await request(app)
             .post('/login')
             .send(req)
-            .expect(403)
+            .expect(400)
+    })
+
+    test('Should fail to login with expired refresh token', async() => {
+        const refreshToken = new RefreshToken({
+            token: chance.guid(),
+            issuedAt: Date.now() - 2000,
+            expiresAt: Date.now() - 1000,
+            userId: testUser.email
+        })
+
+        await refreshToken.save()
+
+        await request(app)
+            .post('/login')
+            .send({ refreshToken: refreshToken.token })
+            .expect(400)
+    })
+
+    test('Should fail to login with invalid refresh token', async() => {
+        await request(app)
+            .post('/login')
+            .expect(400)
     })
 })
