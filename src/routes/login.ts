@@ -8,8 +8,6 @@ import { randomUUID } from 'crypto'
 import RefreshToken from '../schemas/RefreshToken'
 import { Boom } from '@hapi/boom'
 
-const SECRET_KEY = 'mysecret'
-
 export const login = async (user: JWTData, params, res: Response) => {
   const idToken = params?.idToken
   const refreshToken = params?.refreshToken
