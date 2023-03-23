@@ -16,17 +16,24 @@ export const login = async (user: JWTData, params, res: Response) => {
   let email: string | undefined
   const result: {
     accessToken?: string
+    accessTokenExpiresAt?: number
     refreshToken?: string
     refreshTokenExpiresAt?: number
 
   } = {}
+  let isAdmin = false
   if (refreshToken) {
     const fetchedToken = await RefreshToken
-      .findOne({ token: refreshToken })
+      .findOneAndDelete({ token: refreshToken })
     if (fetchedToken == null) {
       throw new Boom('Invalid refresh token', { statusCode: 400 })
     }
+
+    if(fetchedToken.expiresAt < Date.now()) {
+      throw new Boom('Refresh token expired', { statusCode: 400 })
+    }
     email = fetchedToken.userId
+    isAdmin = fetchedToken?.isAdmin || false
   } else {
     let isValidIdToken: DecodedIdToken
     try {
@@ -36,23 +43,27 @@ export const login = async (user: JWTData, params, res: Response) => {
     }
     email = isValidIdToken.email
     const fetchedUser = await User.findOne({ email })
+    isAdmin = fetchedUser?.isAdmin || false
 
-    if (fetchedUser == null) {
-      throw new Boom('You do not have access to this app', { statusCode: 403 })
+    if (fetchedUser === null) {
+      throw new Boom('You do not have access to this app', { statusCode: 400 })
     }
-    const newRefreshToken = await RefreshToken
+  }
+  const refreshTokenIssuedAt = Date.now()
+  const newRefreshToken = await RefreshToken
       .create({
         token: randomUUID(),
-        expiresAt: Date.now() + 1000 * 60 * 60 * 24 * 7,
-        userId: email
+        issuedAt: refreshTokenIssuedAt,
+        expiresAt: refreshTokenIssuedAt + 1000 * 60 * 60 * 24 * 7,
+        userId: email,
+        isAdmin
       })
     result.refreshToken = newRefreshToken.token
     result.refreshTokenExpiresAt = newRefreshToken.expiresAt
-  }
+    const { accessToken, accessTokenExpiresAt } = getAccessToken(email!, isAdmin)
 
-  result.accessToken = getAccessToken({
-    userId: email!
-  })
+    result.accessToken = accessToken
+    result.accessTokenExpiresAt = accessTokenExpiresAt
 
   return result
 }
