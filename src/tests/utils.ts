@@ -10,9 +10,7 @@ import User from "../schemas/User"
 
 const chance = new Chance()
 
-export const TEST_TOKEN = getAccessToken({
-    userId: "email@email.com"
-})
+export const TEST_TOKEN = getAccessToken("email@email.com")
 
 export const getAdminUser = async() => {
     let adminUser: IUser | null = await User.findOne({ isAdmin: true })
@@ -22,39 +20,26 @@ export const getAdminUser = async() => {
             email: chance.email(),
             designation: chance.profession(),
             isAdmin: true
-        }
-        const newUser = new User(adminUser)
-        await newUser.save()
+        })
+        adminUser = await newUser.save()
     }
     return adminUser
 }
 
-export const getUserAccessToken = async(user: IUser) => {
-
-    let refreshToken: IRefreshToken | null = await RefreshToken.findOne({ userId: user.email })
-    if(!refreshToken) {
-        const { refreshToken: newRefreshToken } = await loginUserWithIdToken(user)
-        refreshToken = newRefreshToken
-    }
-   const { body: { accessToken } } = await request(app)
-            .post('/login')
-            .send({ refreshToken })
-            .expect(200)
-
-    return accessToken
-}
-
 export const loginUserWithIdToken = async(user: IUser) => {
+    const isAdmin = user.isAdmin
     firebase.verifyIdToken = jest.fn((idToken) => {
         return {
             email: user.email,
-            name: user.name
+            name: user.name,
+            isAdmin
         } as unknown as Promise<DecodedIdToken>
     })
     const req = {
         idToken: chance.guid()
     }
-    const { body: { accessToken, refreshToken, refreshTokenExpiresAt} } = await request(app)
+
+    const { body: { accessToken, refreshToken, refreshTokenExpiresAt, accessTokenExpiresAt}, statusCode } = await request(app)
         .post('/login')
         .send(req)
         .expect(200)
@@ -62,11 +47,13 @@ export const loginUserWithIdToken = async(user: IUser) => {
     expect(accessToken).toBeDefined()
     expect(refreshToken).toBeDefined()
     expect(refreshTokenExpiresAt).toBeDefined()
+    expect(accessTokenExpiresAt).toBeDefined()
 
     return {
         accessToken,
         refreshToken,
-        refreshTokenExpiresAt
+        refreshTokenExpiresAt,
+        accessTokenExpiresAt
     }
 }
 
