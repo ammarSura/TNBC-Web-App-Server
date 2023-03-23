@@ -11,8 +11,7 @@ export const describeWrapper = async(suiteName: string, childTests: () => void) 
         childTests()
 
         afterAll(async () => {
-            const { email } = await getAdminUser()
-            await User.deleteOne({ email })
+           
             await connection.close()
         })
     })
