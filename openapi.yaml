@@ -3,88 +3,7 @@ info:
   title: TNBC Triple Negative Cell Segmentation 
   version: 1.0.0
   description: Web App for Triple Negative Cell Segmentation research
-# servers:
-#   - url: url
-#     description: Production server
 paths:
-  /coordinates/{imageId}:
-    get:
-      operationId: coordinatesGet
-      tags:
-        - Coordinates
-      summary: Get coordinates of the segments on each image
-      parameters:
-        - name: imageId
-          in: path
-          required: true
-          schema:
-            type: string
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                type: object
-                additionalProperties: false
-                properties:
-                  coordinates:
-                    type: object
-                    additionalProperties: false
-                    properties:
-                      something: 
-                        type: string
-  /images:
-    get:
-      operationId: imagesGet
-      tags:
-        - Images
-      summary: Get three images to assess
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                type: object
-                additionalProperties: false
-                properties:
-                  schema:
-                    type: object
-                    additionalProperties: false
-                    properties:
-                      imageId: 
-                        type: string
-                      url:
-                        type: string
-                      coors:
-                        type: string 
-      security:
-        - bearerAuth: []
-  /images-annotation-selection/{imageId}:
-    patch:
-      operationId: imagesAnnotationSelection
-      tags:
-        - Images Annotation Selection
-      summary: Submit the results of best annotation from client
-      parameters:
-        - name: imageId
-          in: path
-          description: Image Id to patch
-          required: true
-          schema:
-            type: string
-        - name: coorId
-          in: query
-          description: Coordinate Id to patch
-          required: true
-          schema:
-            type: string
-      responses:
-        '200':
-          description: OK     
-      security:
-        - bearerAuth: []       
   /login:
     post:
       operationId: login
@@ -97,13 +16,9 @@ paths:
         content:
           application/json:
             schema:
-              type: object
-              additionalProperties: false
-              properties:
-                idToken:
-                  type: string
-                refreshToken:
-                  type: string
+              oneOf:
+                - $ref: '#/components/schemas/idTokenRequestBody'
+                - $ref: '#/components/schemas/refreshTokenRequestBody'
       responses:
         '200':
           description: OK
@@ -112,9 +27,20 @@ paths:
               schema:
                 type: object
                 additionalProperties: false
+                required:
+                  - accessToken
+                  - accessTokenExpiresAt
+                  - refreshToken
+                  - refreshTokenExpiresAt
                 properties:
                   accessToken:
                     type: string
+                  accessTokenExpiresAt:
+                    type: number
+                  refreshToken:
+                    type: string
+                  refreshTokenExpiresAt:
+                    type: number
   /refreshToken/{refreshToken}:
     delete:
       operationId: deleteRefreshToken
@@ -132,14 +58,45 @@ paths:
         '200':
           description: OK
       security:
+        - bearerAuth: []      
+  /user:
+    get:
+      operationId: getUser
+      tags:
+        - Users
+      summary: Fetch details of a user
+      parameters:
+        - name: userId
+          in: query
+          description: userId of user to be fetched
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+      security:
         - bearerAuth: []       
-          
 components:
   securitySchemes:
     bearerAuth:           
       type: http
       scheme: bearer
       bearerFormat: JWT   
+  schemas:
+    idTokenRequestBody:
+      type: object
+      required:
+        - idToken
+      properties:
+        idToken:
+          type: string
+    refreshTokenRequestBody:
+      type: object
+      required:
+        - refreshToken
+      properties:
+        refreshToken:
+          type: string
 
 
                 
