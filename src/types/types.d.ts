@@ -28,7 +28,12 @@ export interface IImage {
 }
 
 export interface JWTData {
-  userId: string
+  userId: string,
+  accessToken: string,
+  accessTokenExpiresAt: number,
+  refreshToken: string,
+  refreshTokenExpiresAt: number
+  isAdmin?: boolean
 }
 
 export type IRoute = (user: JWTData, params: any, res: Response) => Promise<any>
@@ -36,5 +41,7 @@ export type IRoute = (user: JWTData, params: any, res: Response) => Promise<any>
 export interface IRefreshToken {
   token: string
   userId: string
+  issuedAt: number
   expiresAt: number
+  isAdmin?: boolean
 }
