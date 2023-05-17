@@ -4,27 +4,20 @@ export interface IUser {
   name: string
   email: string
   designation?: string
-  isAdmin?: boolean
+  isAdmin?: boolean,
+  annotatedImageIds?: string[]
 }
-
-export interface ICoors {
-  id: string
-  x: number
-  y: number
-}
-
-export interface IAlgorithmMap {
-  algorithm: 'MESMR' | 'otherAlgo'
-  annotCoors: ICoors
-  correctCounter: number
-}
-
 export interface IImage {
   id: string
-  url: string
-  algorithmMap: IAlgorithmMap[]
-  annotsAssessed: number
-  size?: string
+  url: string,
+  internalImageId: string
+}
+
+export interface IMask {
+  id: string
+  parentImageId: string
+  createdBy: string
+  createdAt: number
 }
 
 export interface JWTData {
@@ -37,7 +30,6 @@ export interface JWTData {
 }
 
 export type IRoute = (user: JWTData, params: any, res: Response) => Promise<any>
-
 export interface IRefreshToken {
   token: string
   userId: string
