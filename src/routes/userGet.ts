@@ -9,11 +9,12 @@ export const userGet = async(user: JWTData, params: any, res: Response) => {
     if((!isAdmin && params.userId) && (user.userId !== params.userId)) {
         throw new Boom('Forbidden', { statusCode: 403 })
     }
-    const email = isAdmin && params.userId ? params.userId : user.userId
-    const fetchedUser = await User.findOne({ email }, '-_id -__v')
+    const email = isAdmin && params?.userId ? params.userId : user.userId
+    console.log(email)
+    const fetchedUser = await User.findOne({ email }, '-_id -__v -annotedImageIds')
     if(!fetchedUser) {
         throw new Boom('User not found', { statusCode: 404 })
     }
-    
+
     return fetchedUser
 }
