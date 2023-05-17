@@ -1,6 +1,6 @@
 openapi: 3.1.0
 info:
-  title: TNBC Triple Negative Cell Segmentation 
+  title: TNBC Triple Negative Cell Segmentation
   version: 1.0.0
   description: Web App for Triple Negative Cell Segmentation research
 paths:
@@ -46,7 +46,7 @@ paths:
       operationId: deleteRefreshToken
       tags:
         - Auth
-      summary: Allow admin to delete 
+      summary: Allow admin to delete
       parameters:
         - name: refreshToken
           in: path
@@ -58,7 +58,7 @@ paths:
         '200':
           description: OK
       security:
-        - bearerAuth: []      
+        - bearerAuth: []
   /user:
     get:
       operationId: getUser
@@ -74,14 +74,52 @@ paths:
       responses:
         '200':
           description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                required:
+                  - name
+                  - email
+                properties:
+                  name:
+                    type: string
+                  email:
+                    type: string
+                  designation:
+                    type: string
       security:
-        - bearerAuth: []       
+        - bearerAuth: []
+  /image:
+    get:
+      operationId: getImage
+      tags:
+        - Images
+      summary: Fetch a random image
+      responses:
+        '200':
+          description: OK
+      security:
+        - bearerAuth: []
+  /mask:
+    post:
+      operationId: postMask
+      tags:
+        - Images
+      summary: Post a mask
+      responses:
+        '200':
+          description: OK
+      security:
+        - bearerAuth: []
+
 components:
   securitySchemes:
-    bearerAuth:           
+    bearerAuth:
       type: http
       scheme: bearer
-      bearerFormat: JWT   
+      bearerFormat: JWT
   schemas:
     idTokenRequestBody:
       type: object
@@ -99,6 +137,6 @@ components:
           type: string
 
 
-                
-                
-        
+
+
+
