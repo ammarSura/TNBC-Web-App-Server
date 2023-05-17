@@ -10,8 +10,7 @@ export const describeWrapper = async(suiteName: string, childTests: () => void) 
 
         childTests()
 
-        afterAll(async () => {
-           
+        afterAll(async () => {  
             await connection.close()
         })
     })

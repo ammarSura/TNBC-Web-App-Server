@@ -1,11 +1,8 @@
 import request from 'supertest'
 import app from './test-server'
-import { Schema, model, connect, Document, connection } from 'mongoose';
 import User from '../schemas/User'
 import { IUser } from '../types/types';
 import Chance from 'chance'
-import { google } from 'googleapis'
-import { FacebookAuthProvider, GoogleAuthProvider } from 'firebase/auth'
 import 'firebase/compat/auth'
 import firebase from '../utils/initialise-firebase'
 import { DecodedIdToken } from 'firebase-admin/lib/auth/token-verifier';
@@ -16,7 +13,7 @@ import RefreshToken from '../schemas/RefreshToken';
 const chance = new Chance()
 describeWrapper('Login tests', () => {
     let testUser: IUser
-    
+
     beforeAll(async () => {
         const newUser = new User({
             name: chance.name(),
@@ -37,10 +34,10 @@ describeWrapper('Login tests', () => {
             .post('/login')
             .send({ refreshToken })
             .expect(200)
-        
+
         expect(accessToken).toBeDefined()
         expect(newRefreshToken).toBeDefined()
-        
+
         const oldToken = await RefreshToken.findOne({ token: refreshToken })
         expect(oldToken).toBeNull()
     })
